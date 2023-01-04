@@ -1,4 +1,4 @@
 variable "cluster_name" {
   type = string
-  default = "observility"
+  default = "test"
 }

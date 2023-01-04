@@ -2,11 +2,6 @@ provider "aws" {
   region = local.region
 }
 
-# provider "grafana" {
-#   url = "http://grafana.steve-aws.com/"
-#   auth = `auth`
-# }
-
 provider "kubernetes" {
   host                   = module.eks_blueprints.eks_cluster_endpoint
   cluster_ca_certificate = base64decode(module.eks_blueprints.eks_cluster_certificate_authority_data)
@@ -23,10 +18,6 @@ provider "helm" {
 
 data "aws_eks_cluster_auth" "this" {
   name = module.eks_blueprints.eks_cluster_id
-}
-
-data "aws_route53_zone" "name" {
-  
 }
 
 data "aws_availability_zones" "available" {
@@ -68,9 +59,7 @@ module "eks_blueprints" {
     mg_5 = {
       node_group_name = "managed-ondemand"
       instance_types  = ["m5.large"]
-      min_size        = 3
-      max_size        = 3
-      desired_size    = 3
+      min_size        = 1
       subnet_ids      = module.vpc.private_subnets
     }
   }
@@ -78,27 +67,6 @@ module "eks_blueprints" {
   tags = local.tags
 }
 
-module "eks_blueprints_kubernetes_addons" {
-  source = "github.com/aws-ia/terraform-aws-eks-blueprints//modules/kubernetes-addons?ref=v4.20.0"
-
-  eks_cluster_id       = module.eks_blueprints.eks_cluster_id
-  eks_cluster_endpoint = module.eks_blueprints.eks_cluster_endpoint
-  eks_oidc_provider    = module.eks_blueprints.oidc_provider
-  eks_cluster_version  = module.eks_blueprints.eks_cluster_version
-
-  # EKS Managed Add-ons
-  enable_amazon_eks_vpc_cni            = true
-  enable_amazon_eks_coredns            = true
-  enable_amazon_eks_kube_proxy         = true
-  enable_amazon_eks_aws_ebs_csi_driver = true
-
-  # Other Addons
-  enable_aws_load_balancer_controller = true
-  enable_external_dns = true
-  eks_cluster_domain  = "steve-aws.com"
-
-  tags = local.tags
-}
 
 #---------------------------------------------------------------
 # Supporting Resources
@@ -140,34 +108,59 @@ module "vpc" {
   tags = local.tags
 }
 
-module "eks_observability_accelerator" {
-  source = "github.com/aws-observability/terraform-aws-observability-accelerator?ref=v1.5.0"
 
-  aws_region = local.region
-  eks_cluster_id = module.eks_blueprints.eks_cluster_id
+module "eks_blueprints_kubernetes_addons" {
+  source = "github.com/aws-ia/terraform-aws-eks-blueprints//modules/kubernetes-addons?ref=v4.20.0"
 
-  enable_amazon_eks_adot = true
-  
-   # reusing existing Amazon Managed Prometheus Workspace
-  enable_managed_prometheus = false
-  managed_prometheus_workspace_id     = "ws-9953dc48-606f-4a85-ac53-4b7dec289572"
-  enable_alertmanager = true
+  eks_cluster_id       = module.eks_blueprints.eks_cluster_id
+  eks_cluster_endpoint = module.eks_blueprints.eks_cluster_endpoint
+  eks_oidc_provider    = module.eks_blueprints.oidc_provider
+  eks_cluster_version  = module.eks_blueprints.eks_cluster_version
 
-  enable_managed_grafana       = false
-  managed_grafana_workspace_id = "g-10f0411262"
-  # grafana_api_key              = var.grafana_api_key
+  # EKS Managed Add-ons
+  enable_amazon_eks_vpc_cni            = true
+  enable_amazon_eks_coredns            = true
+  enable_amazon_eks_kube_proxy         = true
+  enable_amazon_eks_aws_ebs_csi_driver = true
+
+  # Other Addons
+  enable_aws_load_balancer_controller = true
+  enable_external_dns = true
+  eks_cluster_domain  = "steve-aws.com"
 
   tags = local.tags
 }
 
-module "workloads_infra" {
-  source = "github.com/aws-observability/terraform-aws-observability-accelerator/modules/workloads/infra"
 
-  eks_cluster_id = module.eks_observability_accelerator.eks_cluster_id
 
-  dashboards_folder_id = module.eks_observability_accelerator.grafana_dashboards_folder_id
-  managed_prometheus_workspace_id = module.eks_observability_accelerator.managed_prometheus_workspace_id
+# module "eks_observability_accelerator" {
+#   source = "github.com/aws-observability/terraform-aws-observability-accelerator?ref=v1.5.0"
 
-  managed_prometheus_workspace_endpoint = module.eks_observability_accelerator.managed_prometheus_workspace_endpoint
-  managed_prometheus_workspace_region = module.eks_observability_accelerator.managed_prometheus_workspace_region
-}
+#   aws_region = local.region
+#   eks_cluster_id = module.eks_blueprints.eks_cluster_id
+
+#   enable_amazon_eks_adot = true
+  
+#    # reusing existing Amazon Managed Prometheus Workspace
+#   enable_managed_prometheus = false
+#   managed_prometheus_workspace_id     = "ws-9953dc48-606f-4a85-ac53-4b7dec289572"
+#   enable_alertmanager = true
+
+#   enable_managed_grafana       = false
+#   managed_grafana_workspace_id = "g-10f0411262"
+#   # grafana_api_key              = var.grafana_api_key
+
+#   tags = local.tags
+# }
+
+# module "workloads_infra" {
+#   source = "github.com/aws-observability/terraform-aws-observability-accelerator/modules/workloads/infra"
+
+#   eks_cluster_id = module.eks_observability_accelerator.eks_cluster_id
+
+#   dashboards_folder_id = module.eks_observability_accelerator.grafana_dashboards_folder_id
+#   managed_prometheus_workspace_id = module.eks_observability_accelerator.managed_prometheus_workspace_id
+
+#   managed_prometheus_workspace_endpoint = module.eks_observability_accelerator.managed_prometheus_workspace_endpoint
+#   managed_prometheus_workspace_region = module.eks_observability_accelerator.managed_prometheus_workspace_region
+# }
