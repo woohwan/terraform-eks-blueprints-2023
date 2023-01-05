@@ -40,6 +40,12 @@ locals {
     Blueprint  = local.name
     GithubRepo = "github.com/aws-ia/terraform-aws-eks-blueprints"
   }
+
+  # keycloak
+  keycloak = {
+    create_ns: true
+    namespace: "keycloak"
+  }
 }
 
 #---------------------------------------------------------------
@@ -86,6 +92,14 @@ module "eks_blueprints_kubernetes_addons" {
   # Add-ons
   enable_aws_load_balancer_controller = true
  
+  # enable_cert_manager = true
+  # cert_manager_domain_names = ["steve-aws.com"]
+  # cert_manager_install_letsencrypt_issuers = true
+  # cert_manager_letsencrypt_email = "whpark70@gmail.com"
+  # cert_manager_helm_config = {
+
+  # }
+
   # TODO - requires dependency on `cert-manager` for namespace
   enable_cert_manager_csi_driver = true
 
@@ -133,15 +147,32 @@ module "vpc" {
 }
 
 
-# keyclaok
-resource "helm_release" "keyclaok" {
+# keycloak
+resource "kubernetes_namespace" "keycloak" {
+  count = local.keycloak["create_ns"] ? 1 : 0
+
+  metadata {
+    labels = {
+      name = local.keycloak["namespace"]
+    }
+
+    name = local.keycloak["namespace"]
+  }
+}
+
+
+resource "helm_release" "keycloak" {
   name       = "keycloak"
   repository = "https://charts.bitnami.com/bitnami"
   chart      = "keycloak"
   version    = "12.1.5"
-  namespace = "keyclaok"
+  namespace = "keycloak"
 
   values = [
     "${file("values.yaml")}"
+  ]
+
+  depends_on = [
+    kubernetes_namespace.keycloak
   ]
 }

@@ -1,6 +1,20 @@
+global:
+  storageClass: "gp2"
 auth:
-  adminUser: admin
-  adminPassword: keycloak
+  adminUser: "admin"
+  adminPassword: "keycloak"
+service:
+  type: "ClusterIP"
+ingress:
+  enabled: true,
+  ingressClassName: "alb"
+  pathType: "Prefix"
+  annotations:
+    alb.ingress.kubernetes.io/scheme: "internet-facing"
+    alb.ingress.kubernetes.io/target-type: "ip"
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}]'
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:ap-northeast-2:532805286864:certificate/67ededc5-c221-4e88-a3d4-20fc71efd82b
+  hostname: "keycloak.steve-aws.com"
 keycloakConfigCli:
   enabled: true
   configuration:
