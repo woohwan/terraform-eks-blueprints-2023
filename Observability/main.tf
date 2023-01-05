@@ -16,6 +16,11 @@ provider "helm" {
   }
 }
 
+provider "grafana" {
+  url  = module.eks_observability_accelerator.managed_grafana_workspace_endpoint
+  auth = "eyJrIjoidFh5aGlEN0J0cTVpcE1SZEM0MnRhakFNbjk4ZXgzN28iLCJuIjoib2JzZXJ2YWJpbGl0eSIsImlkIjoxfQ=="
+}
+
 data "aws_eks_cluster_auth" "this" {
   name = module.eks_blueprints.eks_cluster_id
 }
@@ -29,7 +34,7 @@ data "aws_availability_zones" "available" {
 
 locals {
   # name = basename(path.cwd)
-  name = "eks_observability_accelerator"
+  name = "observability"
   cluster_name = coalesce(var.cluster_name, local.name)
   region = "ap-northeast-2"
 
@@ -50,16 +55,18 @@ module "eks_blueprints" {
   source = "github.com/aws-ia/terraform-aws-eks-blueprints?ref=v4.20.0"
 
   cluster_name = local.cluster_name
-  cluster_version = "1.24"
+  cluster_version = "1.23"
 
   vpc_id = module.vpc.vpc_id
   private_subnet_ids = module.vpc.private_subnets
 
   managed_node_groups = {
-    mg_5 = {
+    t3 = {
       node_group_name = "managed-ondemand"
-      instance_types  = ["m5.large"]
+      instance_types  = ["t3.xlarge"]
       min_size        = 1
+      max_size        = 2
+      desired_size    = 1
       subnet_ids      = module.vpc.private_subnets
     }
   }
@@ -133,25 +140,28 @@ module "eks_blueprints_kubernetes_addons" {
 
 
 
-# module "eks_observability_accelerator" {
-#   source = "github.com/aws-observability/terraform-aws-observability-accelerator?ref=v1.5.0"
+module "eks_observability_accelerator" {
+  source = "github.com/aws-observability/terraform-aws-observability-accelerator?ref=v1.5.0"
 
-#   aws_region = local.region
-#   eks_cluster_id = module.eks_blueprints.eks_cluster_id
+  aws_region = local.region
+  eks_cluster_id = module.eks_blueprints.eks_cluster_id
 
-#   enable_amazon_eks_adot = true
+  enable_amazon_eks_adot = true
   
-#    # reusing existing Amazon Managed Prometheus Workspace
-#   enable_managed_prometheus = false
-#   managed_prometheus_workspace_id     = "ws-9953dc48-606f-4a85-ac53-4b7dec289572"
-#   enable_alertmanager = true
+   # reusing existing Amazon Managed Prometheus Workspace
+  enable_managed_prometheus = false
+  managed_prometheus_workspace_id     = "ws-9953dc48-606f-4a85-ac53-4b7dec289572"
+  # Region where Amazon Managed Service for Prometheus is deployed
+  managed_prometheus_workspace_region = "us-east-1" 
+  enable_alertmanager = true
 
-#   enable_managed_grafana       = false
-#   managed_grafana_workspace_id = "g-10f0411262"
-#   # grafana_api_key              = var.grafana_api_key
+  enable_managed_grafana       = false
+  managed_grafana_workspace_id  = "g-10f0411262"
 
-#   tags = local.tags
-# }
+  grafana_api_key = "eyJrIjoidFh5aGlEN0J0cTVpcE1SZEM0MnRhakFNbjk4ZXgzN28iLCJuIjoib2JzZXJ2YWJpbGl0eSIsImlkIjoxfQ=="
+
+  tags = local.tags
+}
 
 # module "workloads_infra" {
 #   source = "github.com/aws-observability/terraform-aws-observability-accelerator/modules/workloads/infra"

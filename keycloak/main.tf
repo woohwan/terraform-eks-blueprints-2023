@@ -31,9 +31,9 @@ locals {
   name = basename(path.cwd)
   # var.cluster_name is for Terratest
   cluster_name = coalesce(var.cluster_name, local.name)
-  region       = "us-west-2"
+  region       = "ap-northeast-2"
 
-  vpc_cidr = "10.0.0.0/16"
+  vpc_cidr = "10.2.0.0/16"
   azs      = slice(data.aws_availability_zones.available.names, 0, 3)
 
   tags = {
@@ -47,21 +47,21 @@ locals {
 #---------------------------------------------------------------
 
 module "eks_blueprints" {
-  source = "../.."
+  source = "github.com/aws-ia/terraform-aws-eks-blueprints?ref=v4.20.0"
 
   cluster_name    = local.cluster_name
-  cluster_version = "1.24"
+  cluster_version = "1.23"
 
   vpc_id             = module.vpc.vpc_id
   private_subnet_ids = module.vpc.private_subnets
 
   managed_node_groups = {
-    mg_5 = {
-      node_group_name = "managed-ondemand"
-      instance_types  = ["m5.large"]
-      min_size        = 3
-      max_size        = 3
-      desired_size    = 3
+    t3 = {
+      node_group_name = "managed-keycloak"
+      instance_types  = ["t3.large"]
+      min_size        = 1
+      max_size        = 2
+      desired_size    = 1
       subnet_ids      = module.vpc.private_subnets
     }
   }
@@ -70,7 +70,7 @@ module "eks_blueprints" {
 }
 
 module "eks_blueprints_kubernetes_addons" {
-  source = "../../modules/kubernetes-addons"
+  source = "github.com/aws-ia/terraform-aws-eks-blueprints//modules/kubernetes-addons?ref=v4.20.0"
 
   eks_cluster_id       = module.eks_blueprints.eks_cluster_id
   eks_cluster_endpoint = module.eks_blueprints.eks_cluster_endpoint
@@ -85,33 +85,9 @@ module "eks_blueprints_kubernetes_addons" {
 
   # Add-ons
   enable_aws_load_balancer_controller = true
-  enable_metrics_server               = true
-  enable_aws_cloudwatch_metrics       = true
-  enable_kubecost                     = true
-  enable_gatekeeper                   = true
-
-  enable_cluster_autoscaler = true
-  cluster_autoscaler_helm_config = {
-    set = [
-      {
-        name  = "podLabels.prometheus\\.io/scrape",
-        value = "true",
-        type  = "string",
-      }
-    ]
-  }
-
-  enable_cert_manager = true
-  cert_manager_helm_config = {
-    set_values = [
-      {
-        name  = "extraArgs[0]"
-        value = "--enable-certificate-owner-ref=false"
-      },
-    ]
-  }
+ 
   # TODO - requires dependency on `cert-manager` for namespace
-  # enable_cert_manager_csi_driver = true
+  enable_cert_manager_csi_driver = true
 
   tags = local.tags
 }
@@ -154,4 +130,18 @@ module "vpc" {
   }
 
   tags = local.tags
+}
+
+
+# keyclaok
+resource "helm_release" "keyclaok" {
+  name       = "keycloak"
+  repository = "https://charts.bitnami.com/bitnami"
+  chart      = "keycloak"
+  version    = "12.1.5"
+  namespace = "keyclaok"
+
+  values = [
+    "${file("values.yaml")}"
+  ]
 }
