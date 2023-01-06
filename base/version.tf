@@ -18,7 +18,7 @@ terraform {
   
   backend "s3" {
     bucket = "terraform-blueprints-state"
-    key    = "blueprints/observability"
+    key    = "blueprints/cluster"
     region = "ap-northeast-2"
   }
 
