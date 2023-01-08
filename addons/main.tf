@@ -46,12 +46,16 @@ module "eks_blueprints_kubernetes_addons" {
 
   # Other Addons
   enable_cert_manager = true
-  # enable_cert_manager_csi_driver = true
+  
   cert_manager_domain_names = [ "steve-aws.com"]
   cert_manager_install_letsencrypt_issuers = true
   cert_manager_letsencrypt_email = "whpark@saltware.co.kr"
-
   enable_aws_load_balancer_controller = true
+
+  # cert-manager namespace  필요 <- cert-manager install 후에 설치 또는  apply 재실행
+  enable_cert_manager_csi_driver = true
+
+ 
 
   tags = local.tags
 }
