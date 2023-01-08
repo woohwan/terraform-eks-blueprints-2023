@@ -16,10 +16,10 @@ terraform {
     }
   }
   
-  backend "s3" {
-    bucket = "terraform-blueprints-state"
-    key    = "blueprints/cluster"
-    region = "ap-northeast-2"
-  }
+  # backend "s3" {
+  #   bucket = "terraform-blueprints-state"
+  #   key    = "blueprints/cluster"
+  #   region = "ap-northeast-2"
+  # }
 
 }

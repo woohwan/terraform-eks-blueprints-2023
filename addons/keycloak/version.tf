@@ -18,7 +18,7 @@ terraform {
   
   backend "s3" {
     bucket = "terraform-blueprints-state"
-    key    = "blueprints/keycloak"
+    key    = "blueprints/keycloak/tfstate"
     region = "ap-northeast-2"
   }
 

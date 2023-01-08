@@ -18,7 +18,7 @@ terraform {
   
   backend "s3" {
     bucket = "terraform-blueprints-state"
-    key    = "blueprints/cert-manager"
+    key    = "blueprints/cert-manager/tfstate"
     region = "ap-northeast-2"
   }
 
