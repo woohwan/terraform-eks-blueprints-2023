@@ -37,7 +37,7 @@ locals {
 }
 
 module "eks_blueprints_kubernetes_addons" {
-  source = "github.com/aws-ia/terraform-aws-eks-blueprints//modules/kubernetes-addons?ref=v4.20.0"
+  source = "github.com/aws-ia/terraform-aws-eks-blueprints//modules/kubernetes-addons"
 
   eks_cluster_id       = data.aws_eks_cluster.eks_blueprints.id
   eks_cluster_endpoint = data.aws_eks_cluster.eks_blueprints.endpoint
@@ -45,6 +45,12 @@ module "eks_blueprints_kubernetes_addons" {
   eks_cluster_version  = data.aws_eks_cluster.eks_blueprints.version
 
   # Other Addons
+  enable_cert_manager = true
+  # enable_cert_manager_csi_driver = true
+  cert_manager_domain_names = [ "steve-aws.com"]
+  cert_manager_install_letsencrypt_issuers = true
+  cert_manager_letsencrypt_email = "whpark@saltware.co.kr"
+
   enable_aws_load_balancer_controller = true
 
   tags = local.tags
