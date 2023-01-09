@@ -44,18 +44,12 @@ module "eks_blueprints_kubernetes_addons" {
   eks_oidc_provider    = data.aws_eks_cluster.eks_blueprints.identity[0].oidc[0].issuer
   eks_cluster_version  = data.aws_eks_cluster.eks_blueprints.version
 
-  # Other Addons
-  enable_cert_manager = true
-  
-  cert_manager_domain_names = [ "steve-aws.com"]
-  cert_manager_install_letsencrypt_issuers = true
-  cert_manager_letsencrypt_email = "whpark@saltware.co.kr"
-  enable_aws_load_balancer_controller = true
-  
-  # cert-manager namespace  필요 <- cert-manager install 후에 설치 또는  apply 재실행
-  enable_cert_manager_csi_driver = true
+  # Addons: Prometheus
+  enable_kube_prometheus_stack = true
+  kube_prometheus_stack_helm_config = {
+    values = [file("prometheus-values.yaml")]
+  }
 
- 
 
   tags = local.tags
 }

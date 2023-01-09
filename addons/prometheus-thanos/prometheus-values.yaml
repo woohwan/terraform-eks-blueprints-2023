@@ -1,0 +1,101 @@
+
+alertmanager:
+  ingress:
+    enabled: true
+    ingressClassName: alb
+    annotations: {
+      alb.ingress.kubernetes.io/scheme: "internet-facing",
+      alb.ingress.kubernetes.io/target-type: "ip",
+      alb.ingress.kubernetes.io/listen-port: "[{\"HTTP\": 80}, {\"HTTPS\": 443} ]",
+      alb.ingress.kubernetes.io/backend-protocol: "HTTP",
+      alb.ingress.kubernetes.io/certificate-arn: "arn:aws:acm:ap-northeast-2:532805286864:certificate/67ededc5-c221-4e88-a3d4-20fc71efd82b",
+      
+      alb.ingress.kubernetes.io/ssl-redirect: "443",
+      alb.ingress.kubernetes.io/group.name: "monitoring-alb-group",
+    }
+    Hosts: 
+      - alertmanager.steve-aws.com/*
+
+  alertmanagerSpec:
+    storage:
+    volumeClaimTemplate:
+      spec:
+        storageClassName: gp2
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 20Gi
+
+prometheus:
+  ingress:
+    enabled: true
+    ingressClassName: alb
+    annotations: {
+      alb.ingress.kubernetes.io/scheme: "internet-facing",
+      alb.ingress.kubernetes.io/listen-port: "[{\"HTTP\": 80}, {\"HTTPS\": 443} ]",
+      alb.ingress.kubernetes.io/backend-protocol: "HTTP",
+      alb.ingress.kubernetes.io/certificate-arn: "arn:aws:acm:ap-northeast-2:532805286864:certificate/67ededc5-c221-4e88-a3d4-20fc71efd82b",
+      alb.ingress.kubernetes.io/ssl-redirect: "443",
+      alb.ingress.kubernetes.io/group.name: "monitoring-alb-group",
+    }
+    Hosts: 
+      - prometheus.steve-aws.com/*
+
+  prometheusSpec:
+    storageSpec:
+     volumeClaimTemplate:
+       spec:
+         storageClassName: gp2
+         accessModes: ["ReadWriteOnce"]
+         resources:
+           requests:
+             storage: 20Gi
+
+thanosRuler:
+  ingress:
+    enabled: true
+    ingressClassName: alb
+    annotations: {
+      alb.ingress.kubernetes.io/scheme: "internet-facing",
+      alb.ingress.kubernetes.io/target-type: "ip",
+      alb.ingress.kubernetes.io/listen-port: "[{\"HTTP\": 80}, {\"HTTPS\": 443} ]",
+      alb.ingress.kubernetes.io/backend-protocol: "HTTP",
+      alb.ingress.kubernetes.io/certificate-arn: "arn:aws:acm:ap-northeast-2:532805286864:certificate/67ededc5-c221-4e88-a3d4-20fc71efd82b",
+      alb.ingress.kubernetes.io/ssl-redirect: "443",
+      alb.ingress.kubernetes.io/group.name: "monitoring-alb-group",
+    }
+    Hosts: 
+      - thanos.steve-aws.com/*
+
+  thanosRulerSpec:
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: gp2
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 20Gi
+
+## Component scraping: false for EKS
+kubeApiServer:
+  enabled: false
+kubeEtcd:
+  enabled: false
+
+grafana:
+  enabled: true
+  ingress:
+    enabled: true
+    ingressClassName: alb
+    annotations: {
+      alb.ingress.kubernetes.io/scheme: "internet-facing",
+      alb.ingress.kubernetes.io/target-type: "ip",
+      alb.ingress.kubernetes.io/listen-port: "[{\"HTTP\": 80}, {\"HTTPS\": 443} ]",
+      alb.ingress.kubernetes.io/backend-protocol: "HTTP",
+      alb.ingress.kubernetes.io/certificate-arn: "arn:aws:acm:ap-northeast-2:532805286864:certificate/67ededc5-c221-4e88-a3d4-20fc71efd82b",
+      alb.ingress.kubernetes.io/ssl-redirect: "443",
+      alb.ingress.kubernetes.io/group.name: "monitoring-alb-group",
+    }
+    Hosts: 
+      - grafana.steve-aws.com/*

@@ -81,8 +81,8 @@ module "eks_blueprints_kubernetes_addons" {
   enable_amazon_eks_coredns            = true
   enable_amazon_eks_kube_proxy         = true
   enable_amazon_eks_aws_ebs_csi_driver = true
-  enable_coredns_autoscaler = false
-  enable_coredns_cluster_proportional_autoscaler = false
+  # enable_coredns_autoscaler = false
+  # enable_coredns_cluster_proportional_autoscaler = false
 
   tags = local.tags
 }
