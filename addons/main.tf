@@ -51,6 +51,11 @@ module "eks_blueprints_kubernetes_addons" {
   cert_manager_domain_names = [ "steve-aws.com"]
   cert_manager_install_letsencrypt_issuers = true
   cert_manager_letsencrypt_email = "whpark@saltware.co.kr"
+
+  enable_external_dns = true
+  eks_cluster_domain = "steve-aws.com"
+
+
   enable_aws_load_balancer_controller = true
   
   # cert-manager namespace  필요 <- cert-manager install 후에 설치 또는  apply 재실행

@@ -41,7 +41,7 @@ module "eks_blueprints_kubernetes_addons" {
 
   eks_cluster_id       = data.aws_eks_cluster.eks_blueprints.id
   eks_cluster_endpoint = data.aws_eks_cluster.eks_blueprints.endpoint
-  eks_oidc_provider    = data.aws_eks_cluster.eks_blueprints.identity[0].oidc[0].issuer
+  eks_oidc_provider    = substr(data.aws_eks_cluster.eks_blueprints.identity[0].oidc[0].issuer, 8, -1)
   eks_cluster_version  = data.aws_eks_cluster.eks_blueprints.version
 
   # Addons: Prometheus
