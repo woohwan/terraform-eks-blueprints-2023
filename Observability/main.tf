@@ -18,7 +18,7 @@ provider "helm" {
 
 provider "grafana" {
   url  = module.eks_observability_accelerator.managed_grafana_workspace_endpoint
-  auth = "eyJrIjoidFh5aGlEN0J0cTVpcE1SZEM0MnRhakFNbjk4ZXgzN28iLCJuIjoib2JzZXJ2YWJpbGl0eSIsImlkIjoxfQ=="
+  auth = "eyJrIjoiR1lKVjRnUGppNUI3YUhySG41SkJKRkNTZVJFMmtRa1giLCJuIjoib2JzZXJ2YWJpbGl0eSIsImlkIjoxfQ=="
 }
 
 data "aws_eks_cluster_auth" "this" {
@@ -148,29 +148,29 @@ module "eks_observability_accelerator" {
 
   enable_amazon_eks_adot = true
   
-   # reusing existing Amazon Managed Prometheus Workspace
+  # reusing existing Amazon Managed Prometheus Workspace
   enable_managed_prometheus = false
-  managed_prometheus_workspace_id     = "ws-9953dc48-606f-4a85-ac53-4b7dec289572"
+  # managed_prometheus_workspace_id     = "ws-9953dc48-606f-4a85-ac53-4b7dec289572"
   # Region where Amazon Managed Service for Prometheus is deployed
   managed_prometheus_workspace_region = "us-east-1" 
-  enable_alertmanager = true
+  enable_alertmanager = false
 
   enable_managed_grafana       = false
   managed_grafana_workspace_id  = "g-10f0411262"
 
-  grafana_api_key = "eyJrIjoidFh5aGlEN0J0cTVpcE1SZEM0MnRhakFNbjk4ZXgzN28iLCJuIjoib2JzZXJ2YWJpbGl0eSIsImlkIjoxfQ=="
+  grafana_api_key = "eyJrIjoiR1lKVjRnUGppNUI3YUhySG41SkJKRkNTZVJFMmtRa1giLCJuIjoib2JzZXJ2YWJpbGl0eSIsImlkIjoxfQ=="
 
   tags = local.tags
 }
 
-# module "workloads_infra" {
-#   source = "github.com/aws-observability/terraform-aws-observability-accelerator/modules/workloads/infra"
+module "workloads_infra" {
+  source = "github.com/aws-observability/terraform-aws-observability-accelerator/modules/workloads/infra"
 
-#   eks_cluster_id = module.eks_observability_accelerator.eks_cluster_id
+  eks_cluster_id = module.eks_observability_accelerator.eks_cluster_id
 
-#   dashboards_folder_id = module.eks_observability_accelerator.grafana_dashboards_folder_id
-#   managed_prometheus_workspace_id = module.eks_observability_accelerator.managed_prometheus_workspace_id
+  dashboards_folder_id = module.eks_observability_accelerator.grafana_dashboards_folder_id
+  managed_prometheus_workspace_id = module.eks_observability_accelerator.managed_prometheus_workspace_id
 
-#   managed_prometheus_workspace_endpoint = module.eks_observability_accelerator.managed_prometheus_workspace_endpoint
-#   managed_prometheus_workspace_region = module.eks_observability_accelerator.managed_prometheus_workspace_region
-# }
+  managed_prometheus_workspace_endpoint = module.eks_observability_accelerator.managed_prometheus_workspace_endpoint
+  managed_prometheus_workspace_region = module.eks_observability_accelerator.managed_prometheus_workspace_region
+}
