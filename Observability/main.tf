@@ -18,7 +18,7 @@ provider "helm" {
 
 provider "grafana" {
   url  = module.eks_observability_accelerator.managed_grafana_workspace_endpoint
-  auth = "eyJrIjoiR1lKVjRnUGppNUI3YUhySG41SkJKRkNTZVJFMmtRa1giLCJuIjoib2JzZXJ2YWJpbGl0eSIsImlkIjoxfQ=="
+  auth = "eyJrIjoiQ0FMTnpkdE54UG9MaUo3b0NQa1ZmUFNvU3FnM1g0aGIiLCJuIjoidGVycmFmb3JtIiwiaWQiOjF9"
 }
 
 data "aws_eks_cluster_auth" "this" {
@@ -36,7 +36,7 @@ locals {
   # name = basename(path.cwd)
   name = "observability"
   cluster_name = coalesce(var.cluster_name, local.name)
-  region = "ap-northeast-2"
+  region = "ap-northeast-1"
 
   # Avoid 10.0.0.0/16
   vpc_cidr = "10.1.0.0/16"
@@ -149,16 +149,16 @@ module "eks_observability_accelerator" {
   enable_amazon_eks_adot = true
   
   # reusing existing Amazon Managed Prometheus Workspace
-  enable_managed_prometheus = false
+  enable_managed_prometheus = true
   # managed_prometheus_workspace_id     = "ws-9953dc48-606f-4a85-ac53-4b7dec289572"
   # Region where Amazon Managed Service for Prometheus is deployed
-  managed_prometheus_workspace_region = "us-east-1" 
-  enable_alertmanager = false
+  # managed_prometheus_workspace_region = "us-east-1" 
+  enable_alertmanager = true
 
   enable_managed_grafana       = false
-  managed_grafana_workspace_id  = "g-10f0411262"
+  managed_grafana_workspace_id  = "g-dbb74227e5"
 
-  grafana_api_key = "eyJrIjoiR1lKVjRnUGppNUI3YUhySG41SkJKRkNTZVJFMmtRa1giLCJuIjoib2JzZXJ2YWJpbGl0eSIsImlkIjoxfQ=="
+  grafana_api_key = "eyJrIjoiQ0FMTnpkdE54UG9MaUo3b0NQa1ZmUFNvU3FnM1g0aGIiLCJuIjoidGVycmFmb3JtIiwiaWQiOjF9"
 
   tags = local.tags
 }
