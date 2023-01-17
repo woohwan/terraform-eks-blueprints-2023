@@ -18,7 +18,7 @@ provider "helm" {
 
 provider "grafana" {
   url  = module.eks_observability_accelerator.managed_grafana_workspace_endpoint
-  auth = "eyJrIjoiQ0FMTnpkdE54UG9MaUo3b0NQa1ZmUFNvU3FnM1g0aGIiLCJuIjoidGVycmFmb3JtIiwiaWQiOjF9"
+  auth = "eyJrIjoiN20wSWJBdEZ6Y3NxQjYyeUs2azREZFdUN3k3N0NHeHciLCJuIjoib2JzIiwiaWQiOjF9"
 }
 
 data "aws_eks_cluster_auth" "this" {
@@ -36,7 +36,7 @@ locals {
   # name = basename(path.cwd)
   name = "observability"
   cluster_name = coalesce(var.cluster_name, local.name)
-  region = "ap-northeast-1"
+  region = "ap-northeast-2"
 
   # Avoid 10.0.0.0/16
   vpc_cidr = "10.1.0.0/16"
@@ -141,7 +141,9 @@ module "eks_blueprints_kubernetes_addons" {
 
 
 module "eks_observability_accelerator" {
-  source = "github.com/aws-observability/terraform-aws-observability-accelerator?ref=v1.5.0"
+  # source = "github.com/aws-observability/terraform-aws-observability-accelerator?ref=v1.5.0"
+  # source = "../../aws-observability-accelerator"
+  source = "github.com/woohwan/aws-observability-accelerator"
 
   aws_region = local.region
   eks_cluster_id = module.eks_blueprints.eks_cluster_id
@@ -156,15 +158,19 @@ module "eks_observability_accelerator" {
   enable_alertmanager = true
 
   enable_managed_grafana       = false
-  managed_grafana_workspace_id  = "g-dbb74227e5"
+  # ap-northeast-1
+  # managed_grafana_workspace_id  = "g-dbb74227e5"  
+  # ap-northeast-2
+  managed_grafana_workspace_id  = "g-10f0411262"
 
-  grafana_api_key = "eyJrIjoiQ0FMTnpkdE54UG9MaUo3b0NQa1ZmUFNvU3FnM1g0aGIiLCJuIjoidGVycmFmb3JtIiwiaWQiOjF9"
+  grafana_api_key = "eyJrIjoiN20wSWJBdEZ6Y3NxQjYyeUs2azREZFdUN3k3N0NHeHciLCJuIjoib2JzIiwiaWQiOjF9"
 
   tags = local.tags
 }
 
 module "workloads_infra" {
-  source = "github.com/aws-observability/terraform-aws-observability-accelerator/modules/workloads/infra"
+  # source = "../../aws-observability-accelerator/modules/workloads/infra"
+  source = "github.com/woohwan/aws-observability-accelerator/modules/workloads/infra"
 
   eks_cluster_id = module.eks_observability_accelerator.eks_cluster_id
 
@@ -173,4 +179,5 @@ module "workloads_infra" {
 
   managed_prometheus_workspace_endpoint = module.eks_observability_accelerator.managed_prometheus_workspace_endpoint
   managed_prometheus_workspace_region = module.eks_observability_accelerator.managed_prometheus_workspace_region
+
 }
