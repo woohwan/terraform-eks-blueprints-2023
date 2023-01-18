@@ -42,7 +42,7 @@ module "eks_blueprints_kubernetes_addons" {
   eks_cluster_id       = data.aws_eks_cluster.eks_blueprints.id
   eks_cluster_endpoint = data.aws_eks_cluster.eks_blueprints.endpoint
   // issuer url에서  https:// 제거
-  eks_oidc_provider    = substr(data.aws_eks_cluster.eks_blueprints.identity[0].oidc[0].issuer, 8, -1)
+  eks_oidc_provider    = replace(data.aws_eks_cluster.eks_blueprints.identity[0].oidc[0].issuer, "https://", "")
   eks_cluster_version  = data.aws_eks_cluster.eks_blueprints.version
 
   # Other Addons
@@ -50,15 +50,15 @@ module "eks_blueprints_kubernetes_addons" {
   
   cert_manager_domain_names = [ "steve-aws.com"]
   cert_manager_install_letsencrypt_issuers = true
-  cert_manager_letsencrypt_email = "whpark@saltware.co.kr"
+  # cert_manager_letsencrypt_email = "whpark@saltware.co.kr"
 
   enable_external_dns = true
   eks_cluster_domain = "steve-aws.com"
   # 3 개 zone 전부 등록
   external_dns_route53_zone_arns = [
-    "arn:aws:route53::532805286864:hostedzone/Z0582530BV26P4AI9BGR",
-    "arn:aws:route53::532805286864:hostedzone/Z0072707Q428ADHBQQLV",
-    "arn:aws:route53::532805286864:hostedzone/Z0401133144B3NEZB0K2P",
+    "arn:aws:route53:::hostedzone/Z0582530BV26P4AI9BGR",
+    "arn:aws:route53:::hostedzone/Z0072707Q428ADHBQQLV",
+    "arn:aws:route53:::hostedzone/Z0401133144B3NEZB0K2P",
   ]
 
 
