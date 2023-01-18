@@ -44,8 +44,8 @@ module "eks_observability_accelerator" {
   # deploys AWS Distro for OpenTelemetry operator into the cluster
   enable_amazon_eks_adot = true
 
-  # reusing existing certificate manager? defaults to true
-  enable_cert_manager = true
+  # reusing existing certificate manager? defaults to true. already enabled when execute addons
+  enable_cert_manager = false
 
   # creates a new Amazon Managed Prometheus workspace, defaults to true
   enable_managed_prometheus = local.create_new_workspace
@@ -93,7 +93,7 @@ module "workloads_infra" {
 
   tags = local.tags
 
-  depends_on = [
-    module.eks_observability_accelerator
-  ]
+  # depends_on = [
+  #   module.eks_observability_accelerator
+  # ]
 }
