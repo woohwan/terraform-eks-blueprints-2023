@@ -15,11 +15,11 @@ terraform {
       version = "1.25.0"
     }
   }
-  
-  # backend "s3" {
-  #   bucket = "terraform-blueprints-state"
-  #   key    = "blueprints/addons/prometheus-thanos/tfstate"
-  #   region = "ap-northeast-2"
-  # }
+
+  backend "s3" {
+    bucket = "terraform-blueprints-state"
+    key    = "blueprints/addons/prometheus-thanos/tfstate"
+    region = "ap-northeast-2"
+  }
 
 }
