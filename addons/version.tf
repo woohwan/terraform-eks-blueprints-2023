@@ -18,7 +18,7 @@ terraform {
 
   backend "s3" {
     bucket = "terraform-blueprints-state"
-    key    = "blueprints/addons/tfstate"
+    key    = "blueprints/addons/kube-prometheus/tfstate"
     region = "ap-northeast-2"
   }
 

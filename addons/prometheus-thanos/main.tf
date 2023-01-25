@@ -47,9 +47,11 @@ module "eks_blueprints_kubernetes_addons" {
   # Addons: Prometheus
   enable_kube_prometheus_stack = true
   kube_prometheus_stack_helm_config = {
-    values = [file("prometheus-values.yaml")]
+    values = [templatefile("prometheus-values.yaml", {
+      certificate_arn: var.certificate_arn
+    })]
   }
-
+  # enable_thanos = true
 
   tags = local.tags
 }
