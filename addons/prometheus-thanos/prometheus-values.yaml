@@ -5,7 +5,7 @@
 # ## Override the deployment namespace
 # ##
 # namespaceOverride: "prometheus"
-# fullnameOverride: "prometheus"
+fullnameOverride: "kube-prometheus"
 
 prometheus:
   thanosService:
@@ -20,6 +20,12 @@ prometheus:
           resources:
             requests:
               storage: 20Gi
+    thanos:
+      image: quay.io/thanos/thanos:v0.29.0
+      objectStorageConfig:
+        name: ${thanos_objconfig_secret_name}
+        key: thanos.yaml
+
 
 grafana:
   ingress:
