@@ -8,6 +8,10 @@
 fullnameOverride: "kube-prometheus"
 
 prometheus:
+  serviceAccount:
+    annotations:
+      eks.amazonaws.com/role-arn: ${thanos_sidecar_role_arn}
+
   thanosService:
     enabled: enable
 
@@ -20,12 +24,12 @@ prometheus:
           resources:
             requests:
               storage: 20Gi
+
     thanos:
       image: quay.io/thanos/thanos:v0.29.0
       objectStorageConfig:
-        name: ${thanos_objconfig_secret_name}
+        name: ${thanos_sidecar_objconfig_secret_name}
         key: thanos.yaml
-
 
 grafana:
   ingress:
