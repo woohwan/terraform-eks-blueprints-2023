@@ -38,7 +38,7 @@ locals {
 
 }
 
-module "monitoring" {
+module "logging" {
   source = "github.com/aws-ia/terraform-aws-eks-blueprints//modules/kubernetes-addons"
 
   eks_cluster_id       = data.aws_eks_cluster.eks_blueprints.id
@@ -51,9 +51,15 @@ module "monitoring" {
   enable_aws_for_fluentbit        = true
   aws_for_fluentbit_irsa_policies = [aws_iam_policy.fluentbit_opensearch_access.arn]
   aws_for_fluentbit_helm_config = {
+    name                = "aws-for-fluent-bit"
+    chart               = "aws-for-fluent-bit"
+    version             = "0.1.22"
+    namespace           = "logging"
+    create_namespace    = true
     values = [templatefile("${path.module}/helm_values/aws-for-fluentbit-values.yaml", {
       aws_region = local.region
       host       = local.opensearch_endpoint
+
     })]
   }
 
