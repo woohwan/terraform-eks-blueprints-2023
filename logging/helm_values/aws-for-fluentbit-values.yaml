@@ -1,6 +1,5 @@
 serviceAccount:
   create: false
-  name: "aws-for-fluent-bit-sa"
 
 elasticsearch:
   enabled: true
@@ -8,7 +7,6 @@ elasticsearch:
   awsRegion: ${aws_region}
   host: ${host}
   suppressTypeName: On
-  AWS_Role_Arn: "arn:aws:iam::532805286864:role/blueprints-terraform-aws-for-fluent-bit-sa-irsa"
 
 # These plugins are not used in this example. They are enabled by default if not explicitly disabled
 firehose:

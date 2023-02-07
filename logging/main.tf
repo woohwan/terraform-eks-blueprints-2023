@@ -28,8 +28,10 @@ locals {
   name = "blueprints-terraform"
   cluster_name = local.name
   region = "ap-northeast-2"
-  opensearch_arn = var.opensearch_arn
-  opensearch_endpoint = var.opensearch_endpoint
+  fluentbit_role_arn = module.logging.aws_for_fluent_bit.irsa_arn
+
+  opensearch_arn = aws_elasticsearch_domain.opensearch.arn
+  opensearch_endpoint = aws_elasticsearch_domain.opensearch.endpoint
 
   tags = {
     Blueprint = local.name
@@ -49,21 +51,20 @@ module "logging" {
 
   # Logging
   enable_aws_for_fluentbit        = true
+  aws_for_fluentbit_create_cw_log_group = false
   aws_for_fluentbit_irsa_policies = [aws_iam_policy.fluentbit_opensearch_access.arn]
   aws_for_fluentbit_helm_config = {
-    name                = "aws-for-fluent-bit"
-    chart               = "aws-for-fluent-bit"
-    version             = "0.1.22"
-    namespace           = "logging"
-    create_namespace    = true
     values = [templatefile("${path.module}/helm_values/aws-for-fluentbit-values.yaml", {
       aws_region = local.region
-      host       = local.opensearch_endpoint
-
+      host       = aws_elasticsearch_domain.opensearch.endpoint
     })]
   }
 
   tags = local.tags
+
+  depends_on = [
+    aws_elasticsearch_domain.opensearch
+  ]
 }
 
 
@@ -77,11 +78,11 @@ resource "aws_elasticsearch_domain" "opensearch" {
 
   cluster_config {
     instance_type          = "t3.small.elasticsearch"
-    instance_count         = 3
-    zone_awareness_enabled = true
+    instance_count         = 1
+    zone_awareness_enabled = false
 
     zone_awareness_config {
-      availability_zone_count = 3
+      availability_zone_count = 2
     }
   }
 
