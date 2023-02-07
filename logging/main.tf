@@ -122,7 +122,6 @@ resource "aws_elasticsearch_domain" "opensearch" {
 
 
 resource "aws_iam_service_linked_role" "opensearch" {
-  count            = var.create_iam_service_linked_role == true ? 1 : 0
   aws_service_name = "es.amazonaws.com"
 }
 
@@ -137,34 +136,34 @@ resource "aws_elasticsearch_domain_policy" "opensearch_access_policy" {
   access_policies = data.aws_iam_policy_document.opensearch_access_policy.json
 }
 
-resource "aws_security_group" "opensearch_access" {
-  vpc_id      = module.vpc.vpc_id
-  description = "OpenSearch access"
+# resource "aws_security_group" "opensearch_access" {
+#   vpc_id      = module.vpc.vpc_id
+#   description = "OpenSearch access"
 
-  ingress {
-    description = "host access to OpenSearch"
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    self        = true
-  }
+#   ingress {
+#     description = "host access to OpenSearch"
+#     from_port   = 443
+#     to_port     = 443
+#     protocol    = "tcp"
+#     self        = true
+#   }
 
-  ingress {
-    description = "allow instances in the VPC (like EKS) to communicate with OpenSearch"
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
+#   ingress {
+#     description = "allow instances in the VPC (like EKS) to communicate with OpenSearch"
+#     from_port   = 443
+#     to_port     = 443
+#     protocol    = "tcp"
 
-    cidr_blocks = [module.vpc.vpc_cidr_block]
-  }
+#     cidr_blocks = [module.vpc.vpc_cidr_block]
+#   }
 
-  egress {
-    description = "Allow all outbound access"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"] #tfsec:ignore:aws-vpc-no-public-egress-sgr
-  }
+#   egress {
+#     description = "Allow all outbound access"
+#     from_port   = 0
+#     to_port     = 0
+#     protocol    = "-1"
+#     cidr_blocks = ["0.0.0.0/0"] #tfsec:ignore:aws-vpc-no-public-egress-sgr
+#   }
 
-  tags = local.tags
-}
+#   tags = local.tags
+# }
