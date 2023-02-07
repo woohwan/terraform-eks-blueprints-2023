@@ -14,6 +14,10 @@ terraform {
       source  = "grafana/grafana"
       version = "1.25.0"
     }
+    elasticsearch = {
+      source = "phillbaker/elasticsearch"
+      version = "2.0.7"
+    }
   }
 
   backend "s3" {

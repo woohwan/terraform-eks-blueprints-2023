@@ -16,19 +16,19 @@ data "aws_iam_policy_document" "opensearch_access_policy" {
   # This is the resource-based policy that allows to set access permissions on OpenSearch level
   # To be working properly the client must support IAM (SDK, fluent-bit with sigv4, etc.) Browsers don't do IAM.
   # ref: https://docs.aws.amazon.com/opensearch-service/latest/developerguide/ac.html#ac-types-resource
-  statement {
-    sid       = "WriteDomainLevelAccessToOpenSearch"
-    effect    = "Allow"
-    resources = ["${local.opensearch_arn}/*"] # this can be an index prefix like '/foo-*'
-    actions = [                                                  #ref: https://docs.aws.amazon.com/opensearch-service/latest/developerguide/ac.html#ac-reference
-      "es:ESHttpPost",
-      "es:ESHttpPut"
-    ]
-    principals {
-      type        = "AWS"
-      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-for-fluent-bit-sa"]
-    }
-  }
+  # statement {
+  #   sid       = "WriteDomainLevelAccessToOpenSearch"
+  #   effect    = "Allow"
+  #   resources = ["${local.opensearch_arn}/*"] # this can be an index prefix like '/foo-*'
+  #   actions = [                                                  #ref: https://docs.aws.amazon.com/opensearch-service/latest/developerguide/ac.html#ac-reference
+  #     "es:ESHttpPost",
+  #     "es:ESHttpPut"
+  #   ]
+  #   principals {
+  #     type        = "AWS"
+  #     identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-for-fluent-bit-sa"]
+  #   }
+  # }
 
   statement {
     sid    = "AdminDomainLevelAccessToOpenSearch"
