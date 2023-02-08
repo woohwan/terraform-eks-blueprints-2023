@@ -54,21 +54,11 @@ module "eks_blueprints_kubernetes_addons" {
 
   enable_external_dns = true
   eks_cluster_domain = "steve-aws.com"
-  # 3 개 zone 전부 등록
-  external_dns_route53_zone_arns = [
-    "arn:aws:route53:::hostedzone/Z0582530BV26P4AI9BGR",
-    "arn:aws:route53:::hostedzone/Z0072707Q428ADHBQQLV",
-    "arn:aws:route53:::hostedzone/Z0401133144B3NEZB0K2P",
-  ]
-
-
 
   enable_aws_load_balancer_controller = true
 
   # cert-manager namespace  필요 <- cert-manager install 후에 설치 또는  apply 재실행
   # enable_cert_manager_csi_driver = true
-
-
 
   tags = local.tags
 }
