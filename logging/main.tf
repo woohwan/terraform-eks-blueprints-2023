@@ -5,14 +5,24 @@ provider "aws" {
 provider "kubernetes" {
   host                   = data.aws_eks_cluster.eks_blueprints.endpoint
   cluster_ca_certificate = base64decode(data.aws_eks_cluster.eks_blueprints.certificate_authority[0].data)
-  token                  = data.aws_eks_cluster_auth.eks_blueprints.token
+  # token                  = data.aws_eks_cluster_auth.eks_blueprints.token
+  exec {
+    api_version = "client.authentication.k8s.io/v1beta1"
+    args        = ["eks", "get-token", "--cluster-name", local.cluster_name, "--region", local.region]
+    command     = "aws"
+  }
 }
 
 provider "helm" {
   kubernetes {
     host                   = data.aws_eks_cluster.eks_blueprints.endpoint
     cluster_ca_certificate = base64decode(data.aws_eks_cluster.eks_blueprints.certificate_authority[0].data)
-    token                  = data.aws_eks_cluster_auth.eks_blueprints.token
+    # token                  = data.aws_eks_cluster_auth.eks_blueprints.token
+    exec {
+    api_version = "client.authentication.k8s.io/v1beta1"
+    args        = ["eks", "get-token", "--cluster-name", local.cluster_name, "--region", local.region]
+    command     = "aws"
+  }
   }
 }
 
@@ -54,6 +64,7 @@ module "logging" {
   aws_for_fluentbit_create_cw_log_group = false
   aws_for_fluentbit_irsa_policies = [aws_iam_policy.fluentbit_opensearch_access.arn]
   aws_for_fluentbit_helm_config = {
+    create_service_account_secret_token = true
     values = [templatefile("${path.module}/helm_values/aws-for-fluentbit-values.yaml", {
       aws_region = local.region
       version    = "0.1.22"
@@ -74,7 +85,7 @@ module "logging" {
 #---------------------------------------------------------------
 #tfsec:ignore:aws-elastic-search-enable-domain-logging
 resource "aws_elasticsearch_domain" "opensearch" {
-  domain_name           = "opensearch"
+  domain_name           = "blueprints"
   elasticsearch_version = "OpenSearch_2.3"
 
   cluster_config {
@@ -116,14 +127,14 @@ resource "aws_elasticsearch_domain" "opensearch" {
   }
 
   depends_on = [
-    aws_iam_service_linked_role.opensearch
+    aws_iam_service_linked_role.blueprints
   ]
 
   tags = local.tags
 }
 
 
-resource "aws_iam_service_linked_role" "opensearch" {
+resource "aws_iam_service_linked_role" "blueprints" {
   aws_service_name = "es.amazonaws.com"
 }
 
