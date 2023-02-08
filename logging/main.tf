@@ -16,14 +16,6 @@ provider "helm" {
   }
 }
 
-data "aws_eks_cluster" "eks_blueprints" {
-  name = local.cluster_name
-}
-
-data "aws_eks_cluster_auth" "eks_blueprints" {
-  name = local.cluster_name
-}
-
 locals {
   name = "blueprints-terraform"
   cluster_name = local.name
@@ -56,6 +48,7 @@ module "logging" {
   aws_for_fluentbit_helm_config = {
     values = [templatefile("${path.module}/helm_values/aws-for-fluentbit-values.yaml", {
       aws_region = local.region
+      create_service_account_secret_token = false
       host       = aws_elasticsearch_domain.opensearch.endpoint
     })]
   }
