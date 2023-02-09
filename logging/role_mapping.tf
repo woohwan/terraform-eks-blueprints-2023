@@ -1,18 +1,20 @@
-# # Configure the Elasticsearch provider
-# provider "elasticsearch" {
-#   url = "http://127.0.0.1:9200"
-# }
-
-
-# resource "elasticsearch_opensearch_roles_mapping" "master_user_arn" {
-
-#   role_name     = "all_access"
-#   description   = "fluentbit"
-#   backend_roles = local.fluentbit_role_arn
-#   hosts         = [aws_elasticsearch_domain.opensearch.endpoint]
-#   # users         = try(each.value.users, [])
-
-#   depends_on = [
-#     aws_elasticsearch_domain.opensearch, module.logging
-#   ]
-# }
+resource "null_resource" "role-mapping" {
+  provisioner "local-exec" {
+      command = <<EOT
+        curl -sS -u ${var.opensearch_dashboard_user}:${var.opensearch_dashboard_pw} \
+            -X PATCH \
+            https://${aws_elasticsearch_domain.opensearch.endpoint}/_opendistro/_security/api/rolesmapping/all_access?pretty \
+            -H 'Content-Type: application/json' \
+            -d'
+          [
+            {
+              "op": "add", "path": "/backend_roles", "value": ["${module.logging.aws_for_fluent_bit.irsa_arn}"]
+            }
+          ]
+        '
+EOT
+  }
+  depends_on = [
+    aws_elasticsearch_domain.opensearch, module.logging
+  ]
+}

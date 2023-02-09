@@ -61,13 +61,12 @@ module "logging" {
 
   # Logging
   enable_aws_for_fluentbit        = true
-  aws_for_fluentbit_create_cw_log_group = false
+  # aws_for_fluentbit_create_cw_log_group = false
   aws_for_fluentbit_irsa_policies = [aws_iam_policy.fluentbit_opensearch_access.arn]
   aws_for_fluentbit_helm_config = {
-    create_service_account_secret_token = true
+    version    = "0.1.22"
     values = [templatefile("${path.module}/helm_values/aws-for-fluentbit-values.yaml", {
       aws_region = local.region
-      version    = "0.1.22"
       host       = aws_elasticsearch_domain.opensearch.endpoint
     })]
   }
