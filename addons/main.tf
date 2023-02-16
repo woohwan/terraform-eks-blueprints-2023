@@ -56,6 +56,7 @@ module "eks_blueprints_kubernetes_addons" {
   eks_cluster_domain = "steve-aws.com"
 
   enable_aws_load_balancer_controller = true
+  enable_cluster_autoscaler = true
 
   # cert-manager namespace  필요 <- cert-manager install 후에 설치 또는  apply 재실행
   # enable_cert_manager_csi_driver = true

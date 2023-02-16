@@ -57,7 +57,7 @@ module "eks_blueprints" {
   managed_node_groups = {
     t3 = {
       node_group_name = "managed-ondemand"
-      instance_types  = ["t3.xlarge"]
+      instance_types  = ["t3.medium"]
       min_size        = 1
       max_size        = 2
       desired_size    = 1
