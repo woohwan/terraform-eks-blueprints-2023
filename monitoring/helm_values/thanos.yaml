@@ -7,7 +7,7 @@ query:
   ingress:
     enabled: true
     ingressClassName: alb
-    hostname: "thanos-query.osung.steve-aws.com"
+    hostname: "thanos-query.steve-aws.com"
     pathType: Prefix
     annotations:
       alb.ingress.kubernetes.io/scheme: "internet-facing"
