@@ -54,6 +54,9 @@ module "eks_blueprints" {
   vpc_id = module.vpc.vpc_id
   private_subnet_ids = module.vpc.private_subnets
 
+#  cluster cloudwatch off off
+  cluster_enabled_log_types = null 
+
   managed_node_groups = {
     t3 = {
       node_group_name = "managed-ondemand"
