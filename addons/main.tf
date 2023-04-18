@@ -46,10 +46,10 @@ module "eks_blueprints_kubernetes_addons" {
   eks_cluster_version  = data.aws_eks_cluster.eks_blueprints.version
 
   # Other Addons
-  enable_cert_manager = true
+  # enable_cert_manager = true
 
-  cert_manager_domain_names = [ "steve-aws.com"]
-  cert_manager_install_letsencrypt_issuers = true
+  # cert_manager_domain_names = [ "steve-aws.com"]
+  # cert_manager_install_letsencrypt_issuers = true
   # cert_manager_letsencrypt_email = "whpark@saltware.co.kr"
 
   enable_external_dns = true
