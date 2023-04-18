@@ -56,6 +56,15 @@ module "eks_blueprints_kubernetes_addons" {
   eks_cluster_domain = "steve-aws.com"
 
   enable_aws_load_balancer_controller = true
+  aws_load_balancer_controller_helm_config = {
+    namespace                  = "kube-system"
+    values = [templatefile("${path.module}/values/alb-values.yaml", {
+      cluster_name = local.cluster_name
+      aws_region = local.region
+      certificate = "arn:aws:acm:ap-northeast-2:532805286864:certificate/b3e36713-1e99-4193-a290-4337de2ae28f"
+    })]
+  }
+
   enable_cluster_autoscaler = true
 
   # cert-manager namespace  필요 <- cert-manager install 후에 설치 또는  apply 재실행
