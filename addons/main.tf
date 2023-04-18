@@ -61,7 +61,6 @@ module "eks_blueprints_kubernetes_addons" {
     values = [templatefile("${path.module}/values/alb-values.yaml", {
       cluster_name = local.cluster_name
       aws_region = local.region
-      certificate = "arn:aws:acm:ap-northeast-2:532805286864:certificate/b3e36713-1e99-4193-a290-4337de2ae28f"
     })]
   }
 
