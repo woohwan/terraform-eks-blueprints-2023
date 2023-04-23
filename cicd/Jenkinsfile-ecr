@@ -1,0 +1,35 @@
+pipeline {
+  agent {
+    kubernetes {
+      yaml '''
+    apiVersion: v1
+    kind: Pod
+    spec:
+      containers:
+      - name: kaniko
+        image: gcr.io/kaniko-project/executor:debug
+        command:
+        - sleep
+        args:
+        - 9999999
+        volumeMounts:
+        - name: aws-secret
+          mountPath: /root/.aws/
+      restartPolicy: Never
+      volumes:
+        - name: aws-secret
+          secret:
+            secretName: aws-secret
+'''
+    }
+  }
+  stages {
+    stage('build') {
+      steps {
+        container('kaniko') {
+          sh "/kaniko/executor --dockerfile=Dockerfile --context=git://github.com/woohwan/docker-build-test.git --destination=532805286864.dkr.ecr.ap-northeast-2.amazonaws.com/jenkins-kaniko:v1"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,17 @@
+pipeline {
+  agent {
+    kubernetes {
+      defaultContainer 'kaniko'
+      inheritFrom 'kaniko'
+    }
+  }
+  stages {
+    stage('build') {
+      steps {
+        container('kaniko') {
+          sh "echo hello"
+        }
+      }
+    }
+  }
+}

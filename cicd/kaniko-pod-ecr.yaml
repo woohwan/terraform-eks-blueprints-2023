@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kaniko
+spec:
+  containers:
+    - name: kaniko
+      image: gcr.io/kaniko-project/executor:latest
+      args:
+        - "--dockerfile=Dockerfile"
+        - "--context=git://github.com/woohwan/docker-build-test.git"
+        - "--destination=532805286864.dkr.ecr.ap-northeast-2.amazonaws.com/kaniko-demo:1.0"
+      volumeMounts:
+        # when not using instance role
+        - name: aws-secret
+          mountPath: /root/.aws/
+  restartPolicy: Never
+  volumes:
+    # when not using instance role
+    - name: aws-secret
+      secret:
+        secretName: kaniko-secret
