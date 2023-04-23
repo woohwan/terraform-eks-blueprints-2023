@@ -802,11 +802,7 @@ agent:
           - sleep
           args:
           - 99d
-          volumeMounts:
-          - name: kaniko-secret
-            mountPath: /kaniko/.docker
-          - name: aws-secret
-            mountPath: /root/.aws
+        volumes:
 
   #  python: |
   #    - name: python
