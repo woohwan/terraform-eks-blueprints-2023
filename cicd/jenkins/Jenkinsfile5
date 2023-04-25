@@ -1,0 +1,19 @@
+pipeline {
+  agent {
+    kubernetes {
+      inheritFrom 'eks-devops'
+    }
+  }
+  stages {
+    stage('build') {
+      steps {
+        git branch: 'main', url: 'https://github.com/woohwan/cicd.git'
+        container('kaniko') {
+            dir('jenkins/examples') {
+                sh "/kaniko/executor --dockerfile=Dockerfile --context `pwd` --destination=whpark70/fastapi:1.0"
+            }
+        }
+      }
+    }
+  }
+}

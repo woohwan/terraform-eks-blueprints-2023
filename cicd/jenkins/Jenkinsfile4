@@ -1,0 +1,41 @@
+pipeline {
+  agent {
+    kubernetes {
+      yaml '''
+    apiVersion: v1
+    kind: Pod
+    spec:
+      containers:
+      - name: kaniko
+        image: gcr.io/kaniko-project/executor:debug
+        command:
+        - sleep
+        args:
+        - 9999999
+        volumeMounts:
+        - name: kaniko-secret
+          mountPath: /kaniko/.docker
+      restartPolicy: Never
+      volumes:
+        - name: kaniko-secret
+          secret:
+            secretName: dockercred
+            items:
+              - key: .dockerconfigjson
+                path: config.json
+'''
+    }
+  }
+  stages {
+    stage('build') {
+      steps {
+        git branch: 'main', url: 'https://github.com/woohwan/cicd.git'
+        container('kaniko') {
+            dir('jenkins/examples') {
+                sh "/kaniko/executor --dockerfile=Dockerfile --context `pwd` --destination=whpark70/fastapi:1.0"
+            }
+        }
+      }
+    }
+  }
+}

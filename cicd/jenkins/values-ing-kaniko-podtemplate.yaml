@@ -241,7 +241,8 @@ controller:
 
   # List of plugins to be install during Jenkins controller start
   installPlugins:
-    - kubernetes:3900.va_dce992317b_4
+    # - kubernetes:3900.va_dce992317b_4
+    - kubernetes:3923.v294a_d4250b_91
     - workflow-aggregator:596.v8c21c963d92d
     - git:5.0.0
     - configuration-as-code:1625.v27444588cc3d
@@ -791,9 +792,9 @@ agent:
   # controller.JCasC.defaultConfig: true
   # Best reference is https://<jenkins_url>/configuration-as-code/reference#Cloud-kubernetes. The example below creates a python pod template.
   podTemplates:
-    kaniko: |
-      - name: kaniko
-        label: kaniko
+    eks-devops: |
+      - name: eks-devops
+        label: eks-devops
         serviceAccount: jenkins
         containers:
           - name: kaniko
@@ -810,9 +811,6 @@ agent:
           - secretVolume:
               secretName: dockercred
               mountPath: /kaniko/.docker
-          - secretVolume:
-              secretName: ecr-cred
-              mountPath: /root/.aws/
 
   #  python: |
   #    - name: python
