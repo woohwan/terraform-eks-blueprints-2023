@@ -1,4 +1,4 @@
-def passwd = ""
+// def passwd = ""
 pipeline {
   agent {
     kubernetes {
@@ -17,8 +17,8 @@ pipeline {
 		            container('aws-cli') {
                         // sh 'aws sts get-caller-identity'
                         script {
-                            passwd = sh(encoding: 'UTF-8', returnStdout: true, script: 'aws ecr get-login-password --region ap-northeast-2')
-                            // env.passwd = passwd
+                            def passwd = sh(encoding: 'UTF-8', returnStdout: true, script: 'aws ecr get-login-password --region ap-northeast-2')
+                            env.passwd = passwd
                         }
                        
 		            }
@@ -30,7 +30,9 @@ pipeline {
             echo "================================================="
             echo passwd
             echo "--------------------------------------------------"
-            sh 'sudo podman login --username AWS --password $passwd 532805286864.dkr.ecr.ap-northeast-2.amazonaws.com/fastapi'
+            container('podman') {
+                sh '''sudo podman login --username AWS --password ${passwd} 532805286864.dkr.ecr.ap-northeast-2.amazonaws.com/fastapi'''
+            }
         }
     }
   }
