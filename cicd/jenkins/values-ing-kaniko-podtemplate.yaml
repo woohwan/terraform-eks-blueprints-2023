@@ -792,25 +792,36 @@ agent:
   # controller.JCasC.defaultConfig: true
   # Best reference is https://<jenkins_url>/configuration-as-code/reference#Cloud-kubernetes. The example below creates a python pod template.
   podTemplates:
-    eks-devops: |
-      - name: eks-devops
-        label: eks-devops
+    kaniko: |
+      - name: kaniko
+        label: kaniko
         serviceAccount: jenkins
         containers:
           - name: kaniko
             image: gcr.io/kaniko-project/executor:debug
-            command: "sleep"
-            args: 999999
+            command: "sh -c"
+            args: "cat"
             ttyEnabled: true
-            privileged: true
+            privileged: false
             resourceRequestCpu: "400m"
-            resourceRequestMemory: "512Mi"
+            resourceRequestMemory: "128Mi"
             resourceLimitCpu: "1"
             resourceLimitMemory: "1024Mi"
+          - name: jnlp
+            image: jenkins/inbound-agent:4.3-4
+            command: "jenkins-agent"
+            args: ""
+            ttyEnabled: true
+            privileged: false
+            resourceRequestCpu: "200m"
+            resourceRequestMemory: "64Mi"
+            resourceLimitCpu: "500m"
+            resourceLimitMemory: "256Mi"
         volumes:
           - secretVolume:
               secretName: dockercred
               mountPath: /kaniko/.docker
+              defaultMode: 400
 
   #  python: |
   #    - name: python

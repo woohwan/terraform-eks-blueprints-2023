@@ -1,0 +1,37 @@
+def passwd = ""
+pipeline {
+  agent {
+    kubernetes {
+      inheritFrom 'podman-aws-cli'
+    }
+  }
+  stages {
+    stage('Cred') {
+        steps {
+            // git branch: 'main', url: 'https://github.com/woohwan/cicd.git'
+            withCredentials([[
+		        $class: 'AmazonWebServicesCredentialsBinding',
+		        credentialsId: 'jenkinsecr',
+		        accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+		        secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
+		            container('aws-cli') {
+                        // sh 'aws sts get-caller-identity'
+                        script {
+                            passwd = sh(encoding: 'UTF-8', returnStdout: true, script: 'aws ecr get-login-password --region ap-northeast-2')
+                            // env.passwd = passwd
+                        }
+                       
+		            }
+            }
+        }
+    }
+    stage('login') {
+        steps {
+            echo "================================================="
+            echo passwd
+            echo "--------------------------------------------------"
+            sh 'sudo podman login --username AWS --password $passwd 532805286864.dkr.ecr.ap-northeast-2.amazonaws.com/fastapi'
+        }
+    }
+  }
+}
