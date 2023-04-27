@@ -246,6 +246,8 @@ controller:
     - workflow-aggregator:596.v8c21c963d92d
     - git:5.0.0
     - configuration-as-code:1625.v27444588cc3d
+    - aws-credentials:191.vcb_f183ce58b_9
+    - credentials:1224.vc23ca_a_9a_2cb_0
 
   # Set to false to download the minimum required version of all dependencies.
   installLatestPlugins: true
@@ -807,21 +809,35 @@ agent:
             resourceRequestMemory: "128Mi"
             resourceLimitCpu: "1"
             resourceLimitMemory: "1024Mi"
-          - name: jnlp
-            image: jenkins/inbound-agent:4.3-4
-            command: "jenkins-agent"
-            args: ""
-            ttyEnabled: true
-            privileged: false
-            resourceRequestCpu: "200m"
-            resourceRequestMemory: "64Mi"
-            resourceLimitCpu: "500m"
-            resourceLimitMemory: "256Mi"
         volumes:
           - secretVolume:
               secretName: dockercred
               mountPath: /kaniko/.docker
-              defaultMode: 400
+          - secretVolume:
+              secretName: ecr-cred
+              mountPath: /root/.aws/
+    awscli-podman-alpine: |
+      - name: awscli-podman-alpine
+        label: awscli-podman-alpine
+        serviceAccount: jenkins
+        containers:
+          - name: awscli-podman-alpine
+            image: whpark70/awscli-podman-alpine
+            command: "sleep"
+            args: "99d"
+            ttyEnabled: true
+            privileged: true
+            resourceRequestCpu: "400m"
+            resourceRequestMemory: "128Mi"
+            resourceLimitCpu: "1"
+            resourceLimitMemory: "1024Mi"
+        volumes:
+          - secretVolume:
+              secretName: dockercred
+              mountPath: /kaniko/.docker
+          - secretVolume:
+              secretName: ecr-cred
+              mountPath: /root/.aws/
 
   #  python: |
   #    - name: python
@@ -944,7 +960,7 @@ backup:
     annotations: {}
     # Example for authorization to AWS S3 using kube2iam or IRSA
     # Can also be done using environment variables
-    # iam.amazonaws.com/role: "jenkins"
+    iam.amazonaws.com/role: "jenkins"
     # "eks.amazonaws.com/role-arn": "arn:aws:iam::123456789012:role/jenkins-backup"
   # Set this to terminate the job that is running/failing continously and set the job status to "Failed"
   activeDeadlineSeconds: ""

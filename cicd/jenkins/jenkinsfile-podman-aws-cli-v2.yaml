@@ -1,0 +1,39 @@
+// awscli container build Dockerfile에 podman install해서 하나의 container로 만들어서 kube Pod templates로 등록
+/*
+Dockefile-awscli-podman을 이용
+ecr에 login 후 podman으로 compile하고 ecr에 등록
+*/
+pipeline {
+  agent {
+    kubernetes {
+      inheritFrom 'awscli-podman-alpine'
+    }
+  }
+  stages {
+    stage('Cred') {
+        steps {
+            git branch: 'main', url: 'https://github.com/woohwan/cicd.git'
+            withCredentials([[
+		        $class: 'AmazonWebServicesCredentialsBinding',
+		        credentialsId: 'jenkinsecr',
+		        accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+		        secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
+		            container('awscli-podman-alpine') {
+                        // sh 'aws sts get-caller-identity'
+                        script {
+                            def passwd = sh(encoding: 'UTF-8', returnStdout: true, script: '/opt/aws-cli/bin/aws ecr get-login-password --region ap-northeast-2')
+                            env.passwd = passwd
+                        }
+                        sh '''sudo podman login --username AWS --password ${passwd} 532805286864.dkr.ecr.ap-northeast-2.amazonaws.com/fastapi'''
+                        
+                        dir('jenkins/examples/fastapi') {
+                            sh '''podman build -t 532805286864.dkr.ecr.ap-northeast-2.amazonaws.com/fastapi:1.0 .'''
+                            sh '''podman push 532805286864.dkr.ecr.ap-northeast-2.amazonaws.com/fastapi:1.0 '''
+                        }
+                       
+		            }
+            }
+        }
+    }
+  }
+}

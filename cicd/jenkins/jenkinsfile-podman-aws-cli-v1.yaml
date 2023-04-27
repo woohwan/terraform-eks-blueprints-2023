@@ -1,4 +1,4 @@
-// def passwd = ""
+// podman, awscli container 2개를 pod templates로 등록하고 테스트
 pipeline {
   agent {
     kubernetes {

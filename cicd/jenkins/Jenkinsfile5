@@ -9,8 +9,8 @@ pipeline {
       steps {
         git branch: 'main', url: 'https://github.com/woohwan/cicd.git'
         container('kaniko') {
-            dir('jenkins/examples') {
-                sh "/kaniko/executor --dockerfile=Dockerfile --context `pwd` --destination=whpark70/fastapi:1.0"
+            dir('jenkins/examples/fastapi') {
+                sh "/kaniko/executor --dockerfile=Dockerfile --context `pwd` --destination=whpark70/fastapi:latest"
             }
         }
       }
