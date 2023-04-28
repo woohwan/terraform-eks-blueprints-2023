@@ -1,6 +1,6 @@
-FROM python:3.8-alpine AS builder
+FROM python:alpine3.17 AS builder
 
-ENV AWSCLI_VERSION=2.2.1
+ENV AWSCLI_VERSION=2.11.6
 
 RUN apk add --no-cache \
     curl \
@@ -17,10 +17,12 @@ RUN apk add --no-cache \
     && make \
     && make install
 
-FROM python:3.8-alpine
+FROM python:alpine3.17
 
-RUN apk --no-cache add groff
+RUN apk --no-cache add groff --update podman  fuse-overlayfs && apk add sudo yq
+RUN sed -i 's/#mount_program/mount_program/' /etc/containers/storage.conf
+
+RUN echo jenkins:1000:65536 >/etc/subuid
+RUN echo jenkins:1000:65536 >/etc/subgid
 
 COPY --from=builder /opt/aws-cli/ /opt/aws-cli/
-
-ENTRYPOINT ["/opt/aws-cli/bin/aws"]
