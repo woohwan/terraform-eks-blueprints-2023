@@ -4,6 +4,10 @@ pipeline {
       inheritFrom 'kaniko'
     }
   }
+  environment {
+        GITHUB_TOKEN=credentials('github_token')
+        fastapi="whpark70/fastapi:"
+  }
   stages {
     stage('build') {
       steps {
@@ -13,32 +17,32 @@ pipeline {
           def COMMIT_ID = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
           env.COMMIT_ID = COMMIT_ID
         }
-        
+
         container('kaniko') {
             dir('jenkins/examples/fastapi') {
-                
-                // sh "/kaniko/executor --dockerfile=Dockerfile --context `pwd` --destination=whpark70/fastapi:$COMMIT_ID-$BUILD_NUMBER"
+
+                sh "/kaniko/executor --dockerfile=Dockerfile --context `pwd` --destination=whpark70/fastapi:$COMMIT_ID-$BUILD_NUMBER"
             }
         }
       }
     }
     stage('update gitops repo') {
       steps {
-        git branch: 'main', url: 'https://github.com/woohwan/cicd-gitops.git', credentialsId: 'github-credential'
-        //  use https://hub.docker.com/r/linuxserver/yq
-        container('yq') {
-            dir('manifests/fastapi') {
-              sh('''yq -y -i '.spec.template.spec.containers[0].image = "whpark70/fastapi:$COMMIT_ID-$BUILD_NUMBER"' fastapi-deploy.yaml''')
-            }
-        }
-        sh "`pwd`"
-        sh '''
-        git config --global user.name \\"woohwan\\"
-        git config --global user.email \\"whpark70@naver.com\\"
-        git add --all
-        git commit -m \\"update\\"
-        git push -u origin main
-      '''
+        /*
+        https://github.com/mikefarah/yq.git 를 download하여 수정 후(Dockerfile-yq), build
+        */
+          container('yq') {
+            sh """
+            git clone https://github.com/woohwan/cicd-gitops.git
+            cd cicd-gitops/manifests/fastapi
+            yq -i '.spec.template.spec.containers[0].image = "$fastapi$COMMIT_ID-$BUILD_NUMBER"' fastapi-deploy.yaml
+            git config --local user.name "woohwan"
+            git config --local user.email "whpark70@naver.com"
+            git add --all
+            git commit -m "update #1"
+            git push https://woohwan:${GITHUB_TOKEN}@github.com/woohwan/cicd-gitops.git --all
+            """
+          }
       }
     }
   }
