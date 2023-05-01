@@ -31,5 +31,7 @@ cat << EOF > config.json
 EOF
 
 # create secret
-kubectl create secret generic dockercred --from-file=config.json
+kubectl create secret generic dockercred --from-file=config.json -n jenkins
+
+helm install jenkins jenkins/jenkins -n jenkins -f values-ing-kaniko-podtemplate.yaml
 ```

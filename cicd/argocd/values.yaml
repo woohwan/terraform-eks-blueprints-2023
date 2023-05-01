@@ -625,7 +625,7 @@ controller:
   #  # -- define the application controller `--app-hard-resync`
   #  appHardResyncPeriod: "0"
   #  # -- define the application controller `--app-resync`
-   appResyncPeriod: "15"
+  appResyncPeriod: "15"
   #  # -- define the application controller `--self-heal-timeout-seconds`
   #  selfHealTimeout: "5"
   #  # -- define the application controller `--repo-server-timeout-seconds`
@@ -1855,7 +1855,7 @@ server:
     # -- Additional ingress annotations
     annotations:
       kubernetes.io/ingress.class: alb
-      alb.ingress.kubernetes.io/group.name: cicd
+      # alb.ingress.kubernetes.io/group.name: cicd
       alb.ingress.kubernetes.io/scheme: internet-facing
       alb.ingress.kubernetes.io/target-type: ip
       alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}, {"HTTP":80}]'
