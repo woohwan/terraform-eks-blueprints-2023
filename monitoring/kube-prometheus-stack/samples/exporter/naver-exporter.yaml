@@ -1,0 +1,54 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: naver-exporter-pod
+  labels:
+    app: naver-exporter
+spec:
+  containers:
+    - name: naver-exporter-container
+      image: whpark70/naver-health-exporter
+      env:
+        - name: HTTP_URL
+          value: https://naver.com
+      resources:
+        limits:
+          memory: "128Mi"
+          cpu: "500m"
+      ports:
+        - name: metrics
+          containerPort: 9000
+          protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: naver-exporter-service
+  labels:
+    app: naver-exporter
+spec:
+  selector:
+    app: naver-exporter
+  ports:
+    - port: 9000
+      targetPort: 9000
+      name: metrics
+---
+appVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    release: kps
+    app: naver-exporter
+  name: naver-exporter-monitor
+spec:
+  endpoints:
+    - port: metrics
+      interval: 15s
+      scrapeTimeout: 10s
+  namespaceSelector:
+    matchNames:
+      - monitoring
+    selector:
+      matchLabels:
+        app: naver-exporter
