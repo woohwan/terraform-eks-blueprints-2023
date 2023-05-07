@@ -10,9 +10,9 @@ spec:
       image: whpark70/naver-health-exporter
       env:
         - name: HTTP_URL
-          value: https://naver.com
+          value: "https://naver.com"
         - name: CHECK_INTERVAL
-          value: 5
+          value: "5"
       resources:
         limits:
           memory: "128Mi"
@@ -36,21 +36,4 @@ spec:
       targetPort: 9000
       name: metrics
 ---
-appVersion: monitoring.coreos.com/v1
-kind: ServiceMonitor
-metadata:
-  labels:
-    release: kps
-    app: naver-exporter
-  name: naver-exporter-monitor
-spec:
-  endpoints:
-    - port: metrics
-      interval: 15s
-      scrapeTimeout: 10s
-  namespaceSelector:
-    matchNames:
-      - monitoring
-    selector:
-      matchLabels:
-        app: naver-exporter
+

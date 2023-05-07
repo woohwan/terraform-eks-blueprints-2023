@@ -12,14 +12,14 @@ def get_metrics():
 
     with naver_health_request_time.time():
         resp = requests.get(url=os.environ['HTTP_URL'])
-    
+
     print(resp.status_code)
-            
+
     if not (resp.status_code == 200):
         naver_health_status.state("unhealthy")
-            
+
 if __name__ == '__main__':
     start_http_server(9000)
     while True:
         get_metrics()
-        time.sleep(3)
+        time.sleep(int(os.environ['CHECK_INTERVAL']))
